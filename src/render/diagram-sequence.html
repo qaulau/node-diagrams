@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sequence - Diagrams</title>
+    <script src="../vendors/webfont.js"></script>
+    <script src="../vendors/raphael.min.js"></script>
+    <script src="../vendors/underscore-min.js"></script>
+    <script src="../vendors/sequence-diagram-min.js"></script>
+</head>
+<body>
+<div id="diagram"></div>
+<script>
+    var wrapper = document.getElementById('diagram');
+    const ipcRenderer = require('electron').ipcRenderer, convert = require('../vendors/convert');
+    const sequence2img = function(content, outimage, callback){
+        wrapper.innerHTML = '';
+        var diagram = Diagram.parse(content);
+        diagram.drawSVG('diagram', {theme: 'simple'});
+        convert.svg_convert(wrapper.getElementsByTagName('svg'), outimage, callback);
+    };
+    ipcRenderer.on('render-start', function(event, options) {
+        sequence2img(options.inputContent, options.outImage, function (output) {
+            ipcRenderer.send('render-finished', options.outImage ? output.img : output.svg);
+        });
+    });
+</script>
+</body>
+</html>

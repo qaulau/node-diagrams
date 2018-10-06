@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flowchart - Diagrams</title>
+    <script src="../vendors/raphael.min.js"></script>
+    <script src="../vendors/flowchart.min.js"></script>
+</head>
+<body>
+<div id="diagram"></div>
+<script>
+    var wrapper = document.getElementById('diagram');
+    const ipcRenderer = require('electron').ipcRenderer, convert = require('../vendors/convert');
+    const flowchart2img = function(content, outimage, callback){
+        wrapper.innerHTML = '';
+        var diagram = flowchart.parse(content);
+        diagram.drawSVG('diagram');
+        convert.svg_convert(wrapper.getElementsByTagName('svg'), outimage, callback);
+    };
+    ipcRenderer.on('render-start', function(event, options) {
+        flowchart2img(options.inputContent, options.outImage, function (output) {
+            ipcRenderer.send('render-finished', options.outImage ? output.img : output.svg);
+        });
+    });
+</script>
+</body>
+</html>

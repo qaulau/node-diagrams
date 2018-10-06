@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mermaid - Diagrams</title>
+    <link rel="stylesheet" href="../vendors/mermaid.css">
+    <script src="../vendors/d3.min.js"></script>
+    <script src="../vendors/mermaid.min.js"></script>
+    <script>
+        mermaidAPI.initialize({startOnLoad: false});
+    </script>
+</head>
+<body>
+<div id="diagram"></div>
+<script>
+    var wrapper = document.getElementById('diagram');
+    const ipcRenderer = require('electron').ipcRenderer, convert = require('../vendors/convert');
+    const mermaid2img = function(content, outimage, callback){
+        wrapper.innerHTML = '';
+        mermaidAPI.render('graph', content, function(svgCode) {
+            wrapper.innerHTML = svgCode;
+            convert.svg_convert(wrapper.getElementsByTagName('svg'), outimage, callback);
+        });
+    };
+    ipcRenderer.on('render-start', function(event, options) {
+        mermaid2img(options.inputContent, options.outImage, function (output) {
+            ipcRenderer.send('render-finished', options.outImage ? output.img : output.svg);
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mathjax - Diagrams</title>
+    <script src="../vendors/MathJax/MathJax.js?config=default"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        SVG: {
+          scale: 100,
+          useGlobalCache: false
+        },
+        showMathMenu: false,
+        showProcessingMessages: false,
+        messageStyle: "none",
+        preRemoveClass: "MathJax_Preview",
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/SVG"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          processEscapes: true,
+          preview: "none"
+        },
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+</head>
+<body>
+<div id="diagram"></div>
+<script>
+    const ipcRenderer = require('electron').ipcRenderer, convert = require('../vendors/convert');
+    const mathjax2img = function(texstring, outimage, callback) {
+        var input = texstring;
+        var wrapper = document.getElementById('diagram');
+        wrapper.innerHTML = input;
+        var output = { svg: "", img: ""};
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, wrapper]);
+        MathJax.Hub.Queue(function() {
+            var outs;
+            if(outimage) {
+                outs = wrapper.getElementsByTagName("svg");
+            }else{
+                // 删除数据
+                var mathelms = MathJax.Hub.getJaxByInputType("math/tex");
+                for (i = 0; i < mathelms.length; ++i) {
+                    mathelms[i].SourceElement().remove();
+                }
+                outs = wrapper;
+            }
+            convert.svg_convert(outs, outimage, callback);
+        });
+    };
+    ipcRenderer.on('render-start', function(event, options) {
+        mathjax2img(options.inputContent, options.outImage, function(output){
+            ipcRenderer.send('render-finished', options.outImage ? output.img : output.svg);
+        });
+    });
+</script>
+</body>
+</html>

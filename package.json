@@ -1,0 +1,30 @@
+{
+  "name": "node-diagrams",
+  "description": "Generate Flowcharts, Network Sequence, and Mermaid Diagrams",
+  "version": "0.1.0",
+  "author": {
+    "name": "QauLau",
+    "email": "qaulau@hotmail.com"
+  },
+  "dependencies": {
+    "electron": "^3.0.2",
+    "async": "^2.6.1"
+  },
+  "main": "src/diagrams.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qaulau/node-diagrams.git"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^1.8.2"
+  },
+  "keywords": [
+    "diagram",
+    "flowchart",
+    "sequence",
+    "mathjax",
+    "mathjax"
+  ],
+  "homepage": "https://github.com/qaulau/node-diagrams",
+  "license": "CC0-1.0"
+}
